@@ -1,0 +1,57 @@
+/*
+ * Copyright (c) 2014 Jeff Boody
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+#ifndef pak_file_H
+#define pak_file_H
+
+#include <stdio.h>
+
+#define PAK_MAGIC 0x9ACB00D9
+
+#define PAK_FLAG_READ   0x1
+#define PAK_FLAG_WRITE  0x2
+#define PAK_FLAG_APPEND 0x3
+
+typedef struct pak_key_s
+{
+	int               offset;
+	char*             key;
+	struct pak_key_s* next;
+} pak_key_t;
+
+typedef struct
+{
+	FILE*      f;
+	int        flags;
+	pak_key_t* head;
+	pak_key_t* tail;
+} pak_file_t;
+
+pak_file_t* pak_file_open(const char* fname, int flags);
+void        pak_file_close(pak_file_t** _self);
+int         pak_file_writek(pak_file_t* self, const char* key);
+int         pak_file_write(pak_file_t* self, const void* buf, int count);
+int         pak_file_seek(pak_file_t* self, const char* key);
+int         pak_file_read(pak_file_t* self, void* buf, int count);
+
+#endif
