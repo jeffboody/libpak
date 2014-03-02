@@ -30,11 +30,10 @@
 
 #define PAK_FLAG_READ   0x1
 #define PAK_FLAG_WRITE  0x2
-#define PAK_FLAG_APPEND 0x3
 
 typedef struct pak_key_s
 {
-	int               offset;
+	int               size;
 	char*             key;
 	struct pak_key_s* next;
 } pak_key_t;
@@ -48,10 +47,10 @@ typedef struct
 } pak_file_t;
 
 pak_file_t* pak_file_open(const char* fname, int flags);
-void        pak_file_close(pak_file_t** _self);
+int         pak_file_close(pak_file_t** _self);
 int         pak_file_writek(pak_file_t* self, const char* key);
-int         pak_file_write(pak_file_t* self, const void* buf, int count);
+int         pak_file_write(pak_file_t* self, const void* ptr, int size, int nmemb);
 int         pak_file_seek(pak_file_t* self, const char* key);
-int         pak_file_read(pak_file_t* self, void* buf, int count);
+int         pak_file_read(pak_file_t* self, void* ptr, int size, int nmemb);
 
 #endif
