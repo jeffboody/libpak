@@ -334,8 +334,9 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 	fail_header:
 	fail_keys:
 		pak_file_freekeys(self);
-	fail_fopen:
 		fclose(self->f);
+	fail_fopen:
+		free(self);
 	return NULL;
 }
 
