@@ -319,10 +319,12 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 		int offset = 0;
 		if(fwrite(&magic, sizeof(int), 1, self->f) != 1)
 		{
+			LOGE("fwrite failed fname=%s", fname);
 			goto fail_header;
 		}
 		if(fwrite(&offset, sizeof(int), 1, self->f) != 1)
 		{
+			LOGE("fwrite failed fname=%s", fname);
 			goto fail_header;
 		}
 	}
