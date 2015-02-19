@@ -32,6 +32,7 @@
 static void usage(const char* argv0)
 {
 	LOGE("create:  %s -c file.pak <files>", argv0);
+	LOGE("append:  %s -a file.pak <files>", argv0);
 	LOGE("extract: %s -x file.pak <files>", argv0);
 	LOGE("list:    %s -l file.pak", argv0);
 }
@@ -124,6 +125,18 @@ int main(int argc, char** argv)
 	if(strcmp(cmd, "-c") == 0)
 	{
 		pak = pak_file_open(fname, PAK_FLAG_WRITE);
+
+		int i;
+		for(i = 3; i < argc; ++i)
+		{
+			append(pak, argv[i]);
+		}
+
+		pak_file_close(&pak);
+	}
+	else if(strcmp(cmd, "-a") == 0)
+	{
+		pak = pak_file_open(fname, PAK_FLAG_APPEND);
 
 		int i;
 		for(i = 3; i < argc; ++i)

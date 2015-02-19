@@ -30,6 +30,7 @@
 
 #define PAK_FLAG_READ   0x1
 #define PAK_FLAG_WRITE  0x2
+#define PAK_FLAG_APPEND 0x3
 
 typedef struct pak_key_s
 {

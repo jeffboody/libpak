@@ -85,7 +85,7 @@ static int pak_file_addkey(pak_file_t* self, int size, char* key, int copy)
 	return 0;
 }
 
-static int pak_file_readkeys(pak_file_t* self)
+static int pak_file_readkeys(pak_file_t* self, int* offset)
 {
 	assert(self);
 	LOGD("debug");
@@ -99,15 +99,14 @@ static int pak_file_readkeys(pak_file_t* self)
 	}
 
 	// read footer offset
-	int offset = 0;
-	if(fread(&offset, sizeof(int), 1, self->f) != 1)
+	if(fread(offset, sizeof(int), 1, self->f) != 1)
 	{
 		LOGE("invalid offset");
 		return 0;
 	}
 
 	// seek to the footer
-	if(fseek(self->f, (long) offset, SEEK_SET) == -1)
+	if(fseek(self->f, (long) (*offset), SEEK_SET) == -1)
 	{
 		LOGE("fseek failed");
 		return 0;
@@ -298,6 +297,10 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 	{
 		self->f = fopen(fname, "w");
 	}
+	else if(flags == PAK_FLAG_APPEND)
+	{
+		self->f = fopen(fname, "r+");
+	}
 
 	if(self->f == NULL)
 	{
@@ -307,9 +310,20 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 
 	if(self->flags & PAK_FLAG_READ)
 	{
-		if(pak_file_readkeys(self) == 0)
+		int offset = 0;
+		if(pak_file_readkeys(self, &offset) == 0)
 		{
 			goto fail_keys;
+		}
+
+		// append existing pak file
+		if(self->flags & PAK_FLAG_WRITE)
+		{
+			if(fseek(self->f, (long) offset, SEEK_SET) == -1)
+			{
+				LOGE("fseek failed");
+				goto fail_append;
+			}
 		}
 	}
 	else if(self->flags & PAK_FLAG_WRITE)
@@ -334,6 +348,7 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 
 	// failure
 	fail_header:
+	fail_append:
 	fail_keys:
 		pak_file_freekeys(self);
 		fclose(self->f);
