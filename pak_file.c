@@ -39,7 +39,7 @@ static int pak_file_addkey(pak_file_t* self, int size, char* key, int copy)
 	assert(key);
 	LOGD("debug size=%i, key=%s, copy=%i", size, key, copy);
 
-	pak_key_t* item = (pak_key_t*) malloc(sizeof(pak_key_t));
+	pak_item_t* item = (pak_item_t*) malloc(sizeof(pak_item_t));
 	if(item == NULL)
 	{
 		LOGE("malloc failed");
@@ -173,10 +173,10 @@ static void pak_file_freekeys(pak_file_t* self)
 	assert(self);
 	LOGD("debug");
 
-	pak_key_t* item = self->head;
+	pak_item_t* item = self->head;
 	while(item)
 	{
-		pak_key_t* next = item->next;
+		pak_item_t* next = item->next;
 		free(item->key);
 		free(item);
 		item = next;
@@ -193,7 +193,7 @@ static void pak_file_updatetailsize(pak_file_t* self)
 	if(self->tail)
 	{
 		int start = 2*sizeof(int);
-		pak_key_t* item = self->head;
+		pak_item_t* item = self->head;
 		while(item != self->tail)
 		{
 			start += item->size;
@@ -211,7 +211,7 @@ static int pak_file_writefooter(pak_file_t* self)
 	LOGD("debug");
 
 	int count = 0;
-	pak_key_t* item = self->head;
+	pak_item_t* item = self->head;
 	while(item)
 	{
 		++count;
@@ -271,6 +271,30 @@ static int pak_file_writefooter(pak_file_t* self)
 /***********************************************************
 * public                                                   *
 ***********************************************************/
+
+pak_item_t* pak_item_next(pak_item_t* self)
+{
+	assert(self);
+	LOGD("debug");
+
+	return self->next;
+}
+
+const char* pak_item_key(pak_item_t* self)
+{
+	assert(self);
+	LOGD("debug");
+
+	return (const char*) self->key;
+}
+
+int pak_item_size(pak_item_t* self)
+{
+	assert(self);
+	LOGD("debug");
+
+	return self->size;
+}
 
 pak_file_t* pak_file_open(const char* fname, int flags)
 {
@@ -414,8 +438,8 @@ int pak_file_seek(pak_file_t* self, const char* key)
 	LOGD("debug key=%s", key);
 
 	// find key
-	int        start = 2*sizeof(int);
-	pak_key_t* item  = self->head;
+	int         start = 2*sizeof(int);
+	pak_item_t* item  = self->head;
 	while(item)
 	{
 		if(strncmp(key, item->key, 256) == 0)
@@ -448,4 +472,12 @@ int pak_file_read(pak_file_t* self, void* ptr, int size, int nmemb)
 	LOGD("debug size=%i, nmemb=%i", size, nmemb);
 
 	return fread(ptr, size, nmemb, self->f);
+}
+
+pak_item_t* pak_file_head(pak_file_t* self)
+{
+	assert(self);
+	LOGD("debug");
+
+	return self->head;
 }

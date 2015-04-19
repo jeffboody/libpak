@@ -32,19 +32,23 @@
 #define PAK_FLAG_WRITE  0x2
 #define PAK_FLAG_APPEND 0x3
 
-typedef struct pak_key_s
+typedef struct pak_item_s
 {
-	int               size;
-	char*             key;
-	struct pak_key_s* next;
-} pak_key_t;
+	int                size;
+	char*              key;
+	struct pak_item_s* next;
+} pak_item_t;
+
+pak_item_t* pak_item_next(pak_item_t* self);
+const char* pak_item_key(pak_item_t* self);
+int         pak_item_size(pak_item_t* self);
 
 typedef struct
 {
-	FILE*      f;
-	int        flags;
-	pak_key_t* head;
-	pak_key_t* tail;
+	FILE*       f;
+	int         flags;
+	pak_item_t* head;
+	pak_item_t* tail;
 } pak_file_t;
 
 pak_file_t* pak_file_open(const char* fname, int flags);
@@ -53,5 +57,6 @@ int         pak_file_writek(pak_file_t* self, const char* key);
 int         pak_file_write(pak_file_t* self, const void* ptr, int size, int nmemb);
 int         pak_file_seek(pak_file_t* self, const char* key);
 int         pak_file_read(pak_file_t* self, void* ptr, int size, int nmemb);
+pak_item_t* pak_file_head(pak_file_t* self);
 
 #endif

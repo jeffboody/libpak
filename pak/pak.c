@@ -162,11 +162,11 @@ int main(int argc, char** argv)
 	{
 		pak = pak_file_open(fname, PAK_FLAG_READ);
 
-		pak_key_t* item = pak->head;
+		pak_item_t* item = pak_file_head(pak);
 		while(item)
 		{
-			LOGI("%i %s", item->size, item->key);
-			item = item->next;
+			LOGI("%i %s", pak_item_size(item), pak_item_key(item));
+			item = pak_item_next(item);
 		}
 	}
 	else
