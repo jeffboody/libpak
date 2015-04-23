@@ -323,7 +323,13 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 	}
 	else if(flags == PAK_FLAG_APPEND)
 	{
+		// create files if they do not exist
 		self->f = fopen(fname, "r+");
+		if(self->f == NULL)
+		{
+			self->flags &= ~PAK_FLAG_READ;
+			self->f = fopen(fname, "w");
+		}
 	}
 
 	if(self->f == NULL)
@@ -343,6 +349,9 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 		// append existing pak file
 		if(self->flags & PAK_FLAG_WRITE)
 		{
+			// clear the read flag after reading keys
+			self->flags &= ~PAK_FLAG_READ;
+
 			if(fseek(self->f, (long) offset, SEEK_SET) == -1)
 			{
 				LOGE("fseek failed");
@@ -436,6 +445,12 @@ int pak_file_seek(pak_file_t* self, const char* key)
 	assert(self);
 	assert(key);
 	LOGD("debug key=%s", key);
+
+	if((self->flags & PAK_FLAG_READ) == 0)
+	{
+		LOGE("invalid key=%s, flags=0x%X", key, self->flags);
+		return 0;
+	}
 
 	// find key
 	int         start = 2*sizeof(int);
