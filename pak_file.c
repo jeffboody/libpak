@@ -105,6 +105,13 @@ static int pak_file_readkeys(pak_file_t* self, int* offset)
 		return 0;
 	}
 
+	// check footer offset
+	if(*offset <= (int) sizeof(int))
+	{
+		LOGE("invalid offset=%i", *offset);
+		return 0;
+	}
+
 	// seek to the footer
 	if(fseek(self->f, (long) (*offset), SEEK_SET) == -1)
 	{
@@ -352,6 +359,21 @@ pak_file_t* pak_file_open(const char* fname, int flags)
 			// clear the read flag after reading keys
 			self->flags &= ~PAK_FLAG_READ;
 
+			// clear footer offset
+			int zero = 0;
+			if(fseek(self->f, (long) sizeof(int), SEEK_SET) == -1)
+			{
+				LOGE("fseek failed");
+				goto fail_append;
+			}
+
+			if(fwrite(&zero, sizeof(int), 1, self->f) != 1)
+			{
+				LOGE("fwrite failed fname=%s", fname);
+				goto fail_append;
+			}
+
+			// seek to the footer
 			if(fseek(self->f, (long) offset, SEEK_SET) == -1)
 			{
 				LOGE("fseek failed");

@@ -125,6 +125,10 @@ int main(int argc, char** argv)
 	if(strcmp(cmd, "-c") == 0)
 	{
 		pak = pak_file_open(fname, PAK_FLAG_WRITE);
+		if(pak == NULL)
+		{
+			return EXIT_FAILURE;
+		}
 
 		int i;
 		for(i = 3; i < argc; ++i)
@@ -137,6 +141,10 @@ int main(int argc, char** argv)
 	else if(strcmp(cmd, "-a") == 0)
 	{
 		pak = pak_file_open(fname, PAK_FLAG_APPEND);
+		if(pak == NULL)
+		{
+			return EXIT_FAILURE;
+		}
 
 		int i;
 		for(i = 3; i < argc; ++i)
@@ -149,6 +157,10 @@ int main(int argc, char** argv)
 	else if(strcmp(cmd, "-x") == 0)
 	{
 		pak = pak_file_open(fname, PAK_FLAG_READ);
+		if(pak == NULL)
+		{
+			return EXIT_FAILURE;
+		}
 
 		int i;
 		for(i = 3; i < argc; ++i)
@@ -161,6 +173,10 @@ int main(int argc, char** argv)
 	else if(strcmp(cmd, "-l") == 0)
 	{
 		pak = pak_file_open(fname, PAK_FLAG_READ);
+		if(pak == NULL)
+		{
+			return EXIT_FAILURE;
+		}
 
 		pak_item_t* item = pak_file_head(pak);
 		while(item)
