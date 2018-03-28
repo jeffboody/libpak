@@ -53,6 +53,7 @@ typedef struct
 
 pak_file_t* pak_file_open(const char* fname, int flags);
 int         pak_file_close(pak_file_t** _self);
+int         pak_file_closeErr(pak_file_t** _self);
 int         pak_file_writek(pak_file_t* self, const char* key);
 int         pak_file_write(pak_file_t* self, const void* ptr, int size, int nmemb);
 int         pak_file_seek(pak_file_t* self, const char* key);

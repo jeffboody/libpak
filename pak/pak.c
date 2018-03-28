@@ -77,7 +77,7 @@ static void extract(pak_file_t* pak, const char* fname)
 	fclose(f);
 }
 
-static void append(pak_file_t* pak, const char* fname)
+static int append(pak_file_t* pak, const char* fname)
 {
 	assert(pak);
 	assert(fname);
@@ -85,14 +85,14 @@ static void append(pak_file_t* pak, const char* fname)
 
 	if(pak_file_writek(pak, fname) == 0)
 	{
-		return;
+		return 0;
 	}
 
 	FILE* f = fopen(fname, "r");
 	if(f == 0)
 	{
 		LOGE("fopen %s failed", fname);
-		return;
+		return 0;
 	}
 
 	unsigned char buf[4096];
@@ -101,13 +101,20 @@ static void append(pak_file_t* pak, const char* fname)
 	{
 		if(pak_file_write(pak, buf, bytes, 1) != 1)
 		{
-			break;
+			goto fail_write;
 		}
 
 		bytes = fread(buf, sizeof(unsigned char), 4096, f);
 	}
 
+	// succcess
 	fclose(f);
+	return 1;
+
+	// failure
+	fail_write:
+		fclose(f);
+	return 0;
 }
 
 int main(int argc, char** argv)
@@ -133,7 +140,10 @@ int main(int argc, char** argv)
 		int i;
 		for(i = 3; i < argc; ++i)
 		{
-			append(pak, argv[i]);
+			if(append(pak, argv[i]) == 0)
+			{
+				goto fail_append;
+			}
 		}
 
 		pak_file_close(&pak);
@@ -149,7 +159,10 @@ int main(int argc, char** argv)
 		int i;
 		for(i = 3; i < argc; ++i)
 		{
-			append(pak, argv[i]);
+			if(append(pak, argv[i]) == 0)
+			{
+				goto fail_append;
+			}
 		}
 
 		pak_file_close(&pak);
@@ -184,6 +197,8 @@ int main(int argc, char** argv)
 			LOGI("%i %s", pak_item_size(item), pak_item_key(item));
 			item = pak_item_next(item);
 		}
+
+		pak_file_close(&pak);
 	}
 	else
 	{
@@ -191,5 +206,11 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
+	// success
 	return EXIT_SUCCESS;
+
+	// failure
+	fail_append:
+		pak_file_closeErr(&pak);
+	return EXIT_FAILURE;
 }

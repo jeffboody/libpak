@@ -436,6 +436,31 @@ int pak_file_close(pak_file_t** _self)
 	return ret;
 }
 
+int pak_file_closeErr(pak_file_t** _self)
+{
+	assert(_self);
+
+	int ret = 1;
+	pak_file_t* self = *_self;
+	if(self)
+	{
+		LOGD("debug");
+
+		if(self->flags & PAK_FLAG_WRITE)
+		{
+			// do not write the footer on error
+			// causing the footer offset to be zero
+			// and the file to become invalid
+		}
+
+		pak_file_freekeys(self);
+		fclose(self->f);
+		free(self);
+		*_self = NULL;
+	}
+	return ret;
+}
+
 int pak_file_writek(pak_file_t* self, const char* key)
 {
 	assert(self);
