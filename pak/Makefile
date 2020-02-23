@@ -5,22 +5,26 @@ OBJECTS  = $(TARGET).o $(CLASSES:%=%.o)
 HFILES   = $(CLASSES:%=%.h)
 OPT      = -O2 -Wall
 CFLAGS   = $(OPT) -I.
-LDFLAGS  = -Llibpak -lpak
+LDFLAGS  = -Llibpak -lpak -Llibcc -lcc
 CCC      = gcc
 
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS) libpak
+$(TARGET): $(OBJECTS) libcc libpak
 	$(CCC) $(OPT) $(OBJECTS) -o $@ $(LDFLAGS)
 
-.PHONY: libpak
+.PHONY: libcc libpak
+
+libcc:
+	$(MAKE) -C libcc
 
 libpak:
 	$(MAKE) -C libpak
 
 clean:
 	rm -f $(OBJECTS) *~ \#*\# $(TARGET)
+	$(MAKE) -C libcc clean
 	$(MAKE) -C libpak clean
-	rm libpak
+	rm libcc libpak
 
 $(OBJECTS): $(HFILES)

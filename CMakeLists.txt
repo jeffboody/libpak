@@ -8,8 +8,7 @@ add_library(pak
             STATIC
 
             # Source
-            pak_file.c
-            pak_log.c)
+            pak_file.c)
 
 # Linking
 target_link_libraries(pak

@@ -1,5 +1,5 @@
 TARGET   = libpak.a
-CLASSES  = pak_file pak_log
+CLASSES  = pak_file
 SOURCE   = $(CLASSES:%=%.c)
 OBJECTS  = $(SOURCE:.c=.o)
 HFILES   = $(CLASSES:%=%.h)

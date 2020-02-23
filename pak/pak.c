@@ -22,12 +22,11 @@
  */
 
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 #include "libpak/pak_file.h"
 
 #define LOG_TAG "pak"
-#include "libpak/pak_log.h"
+#include "libcc/cc_log.h"
 
 static void usage(const char* argv0)
 {
@@ -39,9 +38,8 @@ static void usage(const char* argv0)
 
 static void extract(pak_file_t* pak, const char* fname)
 {
-	assert(pak);
-	assert(fname);
-	LOGD("debug fname=%s", fname);
+	ASSERT(pak);
+	ASSERT(fname);
 
 	int size = pak_file_seek(pak, fname);
 	if(size == 0)
@@ -79,9 +77,8 @@ static void extract(pak_file_t* pak, const char* fname)
 
 static int append(pak_file_t* pak, const char* fname)
 {
-	assert(pak);
-	assert(fname);
-	LOGD("debug fname=%s", fname);
+	ASSERT(pak);
+	ASSERT(fname);
 
 	if(pak_file_writek(pak, fname) == 0)
 	{
